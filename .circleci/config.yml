@@ -23,3 +23,6 @@ jobs:
           name: Waiting for Mongo
           command: dockerize -wait tcp://localhost:27017 -timeout 1m
       - checkout
+      - run:
+          name: Connect to DB
+          command: mongo localhost --eval "printjson(db.apikeys.count());" 
