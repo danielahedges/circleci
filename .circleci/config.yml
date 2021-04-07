@@ -1,0 +1,25 @@
+version: 2.1
+orbs:
+  node: circleci/node@3.0.0
+jobs:
+  build:
+    # pre-built images: https://circleci.com/docs/2.0/circleci-images/
+    docker:
+      - image: circleci/node:10-browsers
+      - image: circleci/mongo:4.4
+        environment:
+          MONGO_USERNAME: mongouser
+          MONGO_PASSWORD: mongopass
+    steps:
+      - run:
+          name: MongoDB Install
+          command: |
+             wget -qO - https://www.mongodb.org/static/pgp/server-4.2.asc | sudo apt-key add -
+             echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.2 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.2.list
+             sudo apt-get update
+             sudo apt-get install -y mongodb-org-shell
+      - setup_remote_docker
+      - run:
+          name: Waiting for Mongo
+          command: dockerize -wait tcp://localhost:27017 -timeout 1m
+      - checkout
