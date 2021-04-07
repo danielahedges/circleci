@@ -13,6 +13,16 @@ jobs:
     steps:
       - setup_remote_docker
       - run:
+          name: MongoDB Install
+          command: |
+              sudo apt-get update && apt-get -y install gnupg
+              sudo apt-get -y install ca-certificates && update-ca-certificates
+              sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 9DA31620334BD75D9DCB49F368818C72E52529D4
+              echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/4.0 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-4.0.list
+              sudo apt-get update
+              sudo apt-get -y install mongodb-org-shell
+              sudo apt-get -y install mongodb-org-tools
+      - run:
           name: Waiting for Mongo
           command: dockerize -wait tcp://localhost:27017 -timeout 1m
       - checkout
