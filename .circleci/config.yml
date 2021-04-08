@@ -3,6 +3,10 @@ jobs:
   build:
     docker:
       - image: circleci/node:10-browsers
+      - image: circleci/mongo:4.4
+        environment:
+          MONGO_USERNAME: mongouser
+          MONGO_PASSWORD: mongopass
     steps:
       - run:
           name: MongoDB Install
