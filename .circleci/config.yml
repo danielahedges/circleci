@@ -1,9 +1,10 @@
 version: 2.1
 orbs:
-  node: circleci/node:10-browsers
 jobs:
   build:
     # pre-built images: https://circleci.com/docs/2.0/circleci-images/
+    docker:
+      - image: circleci/node:10-browsers
     steps:
       - run:
           name: MongoDB Install
