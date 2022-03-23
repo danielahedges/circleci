@@ -22,4 +22,4 @@ jobs:
       - checkout
       - run:
           name: Get version
-          command: psql -d directsource -c "select version();"
+          command: psql -d db -c "select version();"
