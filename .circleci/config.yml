@@ -2,28 +2,24 @@ version: 2.1
 jobs:
   build:
     docker:
-      - image: cimg/node:16.14-browsers
-      - image: mongo:4.4
+      - image: circleci/openjdk:11
         environment:
-          MONGO_USERNAME: mongouser
-          MONGO_PASSWORD: mongopass
+          SPRING_DATASOURCE_USERNAME: springuser
+          REPO_NAME: danielahedges/circleci
+      - image: circleci/postgres:10.11-alpine-ram
+        environment:
+          POSTGRES_USER: postgresuser
+          POSTGRES_DB: db
     steps:
       - run:
-          name: MongoDB Install
+          name: Install psql
           command: |
-             sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 9DA31620334BD75D9DCB49F368818C72E52529D4
-             echo "deb [ arch=amd64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.0.list
-             sudo apt-get update
-             sudo apt-get install -y mongodb-org-shell
+            echo 'deb http://apt.postgresql.org/pub/repos/apt/ stretch-pgdg main' | sudo tee --append /etc/apt/sources.list.d/pgdg.list
+            sudo wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+            sudo apt-get update
+            sudo apt-get install -y postgresql-client-10
       - setup_remote_docker
-      - run:
-          name: Waiting for Mongo
-          command: dockerize -wait tcp://localhost:27017 -timeout 1m
       - checkout
       - run:
-          name: Get versions
-          command: |
-              node -v
-              npm -v
-              mongo --version
-              mongo localhost --eval "db.version()"
+          name: Get version
+          command: psql -d directsource -c "select version();"
