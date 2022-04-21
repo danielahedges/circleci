@@ -1,25 +1,26 @@
-version: 2.1
+version: '2.1'
 jobs:
   build:
     docker:
-      - image: circleci/openjdk:11
-        environment:
-          SPRING_DATASOURCE_USERNAME: springuser
-          REPO_NAME: danielahedges/circleci
-      - image: circleci/postgres:10.11-alpine-ram
-        environment:
-          POSTGRES_USER: postgresuser
-          POSTGRES_DB: db
+      - image: cimg/node:16.14-browsers
     steps:
-      - run:
-          name: Install psql
-          command: |
-            echo 'deb http://apt.postgresql.org/pub/repos/apt/ stretch-pgdg main' | sudo tee --append /etc/apt/sources.list.d/pgdg.list
-            sudo wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
-            sudo apt-get update
-            sudo apt-get install -y postgresql-client-10
-      - setup_remote_docker
       - checkout
-      - run:
-          name: Get version
-          command: psql -d db -U postgresuser -h localhost -c "select count(1) from information_schema.schemata;"
+      - run: echo "export IMAGE_TAG=${CIRCLE_BRANCH}.${CIRCLE_BUILD_NUM}" >> workspace/image_tag
+      - persist_to_workspace:
+          root: workspace
+          paths:
+            - image_tag
+  deploy:
+    docker:
+      - image: 'cimg/python:3.9.1'
+    steps:
+      - attach_workspace:
+          at: ./workspace
+      - run: cat ./workspace/image_tag >> $BASH_ENV
+      - run: echo ${IMAGE_TAG}
+workflows:
+  build-and-deploy:
+    - build
+    - deploy
+        requires:
+          - build
