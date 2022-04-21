@@ -5,6 +5,7 @@ jobs:
       - image: cimg/node:16.14-browsers
     steps:
       - checkout
+      - run: mkdir -p workspace
       - run: echo "export IMAGE_TAG=${CIRCLE_BRANCH}.${CIRCLE_BUILD_NUM}" >> workspace/image_tag
       - persist_to_workspace:
           root: workspace
