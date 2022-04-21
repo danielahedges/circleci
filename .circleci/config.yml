@@ -20,7 +20,8 @@ jobs:
       - run: echo ${IMAGE_TAG}
 workflows:
   build-and-deploy:
-    - build
-    - deploy
-        requires:
-          - build
+    jobs:
+      - build
+      - deploy
+          requires:
+            - build
